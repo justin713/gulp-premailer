@@ -1,1 +1,1 @@
-## Premailer plugin for Gulpjs
+## Premailer plugin for gulp
