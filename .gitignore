@@ -1,0 +1,9 @@
+## gitignore
+*.bak
+*.DS_Store
+*.project
+*.settings
+*.buildpath
+node_modules/*
+gulp-premailer.sublime-project
+gulp-premailer.sublime-workspace
