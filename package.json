@@ -17,7 +17,7 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --reporter spec"
   },
   "keywords": [
     "gulppugin",
@@ -33,10 +33,12 @@
     "through2": "~0.4.0",
     "win-spawn": "~2.0.0",
     "dargs": "~0.1.0",
-    "temp-write": "~0.1.1"
+    "temp-write": "~0.1.1",
+    "which": "~1.0.5"
   },
   "devDependencies": {
     "mocha": "~1.17.1",
-    "should": "~3.1.2"
+    "should": "~3.1.2",
+    "spec": "~1.0.1"
   }
 }
