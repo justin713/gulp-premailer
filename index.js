@@ -6,16 +6,14 @@ var fs = require('fs');
 var path = require('path');
 var gutil = require('gulp-util');
 var through = require('through2');
+var es = require('event-stream');
+var child_process = require('child_process');
 var spawn = require('win-spawn');
 var tempWrite = require('temp-write');
 var dargs = require('dargs');
 var which = require('which');
 
 module.exports = function (options) {
-	options = options || {};
-	var passedArgs = dargs(options, ['bundleExec']);
-	var bundleExec = options.bundleExec;
-
 	try {
 		which.sync('premailer');
 	} catch (err) {
@@ -26,14 +24,20 @@ module.exports = function (options) {
 		var self = this;
 
 		if (file.isNull() || path.basename(file.path)[0] === '_') {
-			this.push(file);
+			self.push(file);
 			return cb();
 		}
 
 		if (file.isStream()) {
-			this.emit('error', new gutil.PluginError('gulp-premailer', 'Streaming not supported'));
+			self.emit('error', new gutil.PluginError('gulp-premailer', 'Streaming not supported'));
 			return cb();
 		}
+
+		// Works, with events.js error: EPIPE
+		// var pm = child_process.exec('premailer ' + file.path);
+		// file.pipe(es.duplex(pm.stdin, pm.stdout))
+		// 	// .pipe(process.stdout)
+		// 	.pipe(fs.createWriteStream(path.dirname(file.path) + '/results/' + gutil.replaceExtension(path.basename(file.path), '-duplexed.html')));
 
 		tempWrite(file.contents, path.extname(file.path), function (err, tempFile) {
 			if (err) {
@@ -55,20 +59,15 @@ module.exports = function (options) {
 			cp.stderr.on('data', function (data) {
 				errors += data;
 			});
+			if (errors.length >= 1) {
+				console.log("Error: " + errors);
+			}
 
-			cp.stdout.on('data', function (data) {
-				console.log('stdout: ' + data);
-				console.log(gutil.replaceExtension(file.path, '-inline.html'));
-				console.log(path.dirname(file.path));
-				self.push(new gutil.File({
-					base: path.dirname(file.path),
-					path: gutil.replaceExtension(file.path, '-inline.html'),
-					contents: data
-				}));
-				cb();
-			});
+			cp.stdout.pipe(fs.createWriteStream(path.dirname(file.path) + '/results/' + gutil.replaceExtension(path.basename(file.path), '-inline.html')));
 
 			cp.on('close', function (code) {
+				console.log('child process exited with code ' + code);
+				
 				if (code === 127) {
 					self.emit('error', new gutil.PluginError('gulp-premailer', 'You need to have Ruby and Premailer installed and in your PATH for this task to work.'));
 					self.push(file);
