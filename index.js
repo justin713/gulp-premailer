@@ -3,9 +3,12 @@
 'use strict';
 
 var gutil = require('gulp-util');
+var fs = require('fs');
+var path = require('path');
 var which = require('which');
 var through = require('through2');
 var spawn = require('win-spawn');
+var cheerio = require('cheerio');
 
 module.exports = function (options) {
 	try {
@@ -24,6 +27,15 @@ module.exports = function (options) {
 			self.emit('error', new gutil.PluginError('gulp-premailer', 'Streaming not supported'));
 			return done();
 		}
+
+		var $ = cheerio.load(file.contents.toString());
+		var stylesheetList = getStylesheetList($);
+		var stylesheetContents = getStylesheetContents(stylesheetList, file.path);
+		stylesheetContents.forEach(function(styles) {
+			$('head').append("<style>\r\n" + styles.toString() + "</style>\r\n");
+		});
+
+		file.contents = new Buffer($.html());
 
 		var self = this;
 		var errors = '';
@@ -72,3 +84,35 @@ module.exports = function (options) {
 
 	return stream;
 };
+
+function getStylesheetList(cheerioObj) {
+	var stylesheetList = [];
+
+	cheerioObj('link').each(function (i, elem) {
+		stylesheetList[i] = cheerioObj(this).attr('href');
+	});
+
+	if (stylesheetList.length === 0) {
+		stylesheetList = false;
+	}
+
+	return stylesheetList;
+}
+
+function getStylesheetContents(styleList, filePath) {
+	if (styleList.length === 0) {
+		return false;
+	}
+
+	var stylesheetContents = [];
+	for (var i=0; i < styleList.length; i++) {
+		var style = fs.readFileSync(path.dirname(filePath) + '/' + styleList[i]);
+		stylesheetContents.push(style);
+	}
+
+	return stylesheetContents;
+}
+
+function removeStyleLinks(cheerioObj) {
+	cheerioObj('link').remove();
+}
