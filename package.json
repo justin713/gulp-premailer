@@ -1,6 +1,6 @@
 {
   "name": "gulp-premailer",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A gulp module using Premailer to bring CSS styles inline when developing HTML emails.",
   "homepage": "https://github.com/justin713/gulp-premailer",
   "author": {
