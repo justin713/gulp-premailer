@@ -10,7 +10,7 @@ var through = require('through2');
 var spawn = require('win-spawn');
 var cheerio = require('cheerio');
 
-module.exports = function (options) {
+module.exports = function () {
 	try {
 		which.sync('premailer');
 	} catch (err) {
@@ -31,6 +31,7 @@ module.exports = function (options) {
 		var $ = cheerio.load(file.contents.toString());
 		var stylesheetList = getStylesheetList($);
 		var stylesheetContents = getStylesheetContents(stylesheetList, file.path);
+
 		stylesheetContents.forEach(function(styles) {
 			$('head').append("<style>\r\n" + styles.toString() + "</style>\r\n");
 		});
@@ -48,7 +49,6 @@ module.exports = function (options) {
 			return done();
 		});
 
-		cp.stderr.setEncoding('utf8');
 		cp.stderr.on('data', function (data) {
 			errors += data;
 		});
@@ -106,13 +106,11 @@ function getStylesheetContents(styleList, filePath) {
 
 	var stylesheetContents = [];
 	for (var i=0; i < styleList.length; i++) {
-		var style = fs.readFileSync(path.dirname(filePath) + '/' + styleList[i]);
-		stylesheetContents.push(style);
+		fs.readFile(path.dirname(filePath) + '/' + styleList[i], 'utf8', function (err, data) {
+			if (err) console.log(err);
+			stylesheetContents.push(data);
+		});
 	}
 
 	return stylesheetContents;
-}
-
-function removeStyleLinks(cheerioObj) {
-	cheerioObj('link').remove();
 }

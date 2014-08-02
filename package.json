@@ -1,6 +1,6 @@
 {
   "name": "gulp-premailer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A gulp module using Premailer to bring CSS styles inline when developing HTML emails.",
   "homepage": "https://github.com/justin713/gulp-premailer",
   "author": {
@@ -16,9 +16,6 @@
   },
   "license": "MIT",
   "main": "index.js",
-  "scripts": {
-    "test": "mocha --reporter spec"
-  },
   "keywords": [
     "gulpplugin",
     "premailer",
@@ -34,10 +31,5 @@
     "win-spawn": "~2.0.0",
     "which": "~1.0.5",
     "cheerio": "^0.15.0"
-  },
-  "devDependencies": {
-    "mocha": "~1.17.1",
-    "should": "~3.1.2",
-    "spec": "~1.0.1"
   }
 }
