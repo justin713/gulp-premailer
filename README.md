@@ -41,11 +41,5 @@ In the example above, any files matched by the `gulp.src()` glob are processed b
 
 With the latest update, gulp-premailer supports linked stylesheets. Using [cheerio](http://matthewmueller.github.io/cheerio/) by [MatthewMueller](https://github.com/matthewmueller), gulp-premailer searches for `<link>` elements, then tries to find the referenced files and append them to the `<head>` and finally, removes the original `<link>` elements. (May make sense for this to be an option).
 
-### Caveats
-
-~~Currently, only embedded styles are inlined &mdash; _no linked external stylesheets are inlined_. Unfortunately, gulp-premailer is a learning project and functionality is very limited. In a (hopefully soon) future release, I am aiming to use [juice](https://github.com/LearnBoost/juice) or something like it to fetch and insert external stylesheets to be inlined as well.~~
-
-As mentioned above, linked stylesheets are now supported. However, there may be some issues with paths as I've only tested linked stylesheets in the same dir.
-
 ### Contributing
 As said previously, this is a learning project based on need for other projects and desire to experiment with node. I welcome all insight, discussion and code suggestions.
