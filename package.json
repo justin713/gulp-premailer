@@ -16,6 +16,9 @@
   },
   "license": "MIT",
   "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
   "keywords": [
     "gulpplugin",
     "premailer",
@@ -31,5 +34,10 @@
     "win-spawn": "~2.0.0",
     "which": "~1.0.5",
     "cheerio": "^0.15.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.17.1",
+    "should": "~3.1.2",
+    "spec": "~1.0.1"
   }
 }
