@@ -10,7 +10,7 @@ var through = require('through2');
 var spawn = require('win-spawn');
 var cheerio = require('cheerio');
 
-module.exports = function () {
+module.exports = function (opts) {
 	try {
 		which.sync('premailer');
 	} catch (err) {
@@ -33,7 +33,19 @@ module.exports = function () {
 		var self = this;
 		var errors = '';
 		var bufferObjs = [];
-		var cp = spawn('premailer', [file.path]);
+		var args = [file.path];
+
+		// Convert JS object to CLI args.. i.e. query-string: foo to
+		// --query-string=foo
+		if(typeof(opts) == 'object') {
+			Object.keys(opts).forEach(function(key) {
+				if(opts[key]) {
+					args.push('--' + key.replace(/^--/,'') + '=' + opts[key] + '');
+				}
+			});
+		}
+
+		var cp = spawn('premailer', args);
 
 		cp.on('error', function (err) {
 			self.emit('error', new gutil.PluginError('gulp-premailer', err));
