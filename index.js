@@ -28,15 +28,7 @@ module.exports = function () {
 			return done();
 		}
 
-		var $ = cheerio.load(file.contents.toString());
-		var stylesheetList = getStylesheetList($);
-		var stylesheetContents = getStylesheetContents(stylesheetList, file.path);
-
-		stylesheetContents.forEach(function(styles) {
-			$('head').append("<style>\r\n" + styles.toString() + "</style>\r\n");
-		});
-
-		file.contents = new Buffer($.html());
+		file.contents = new Buffer(file.contents.toString());
 
 		var self = this;
 		var errors = '';
@@ -84,33 +76,3 @@ module.exports = function () {
 
 	return stream;
 };
-
-function getStylesheetList(cheerioObj) {
-	var stylesheetList = [];
-
-	cheerioObj('link').each(function (i, elem) {
-		stylesheetList[i] = cheerioObj(this).attr('href');
-	});
-
-	if (stylesheetList.length === 0) {
-		stylesheetList = false;
-	}
-
-	return stylesheetList;
-}
-
-function getStylesheetContents(styleList, filePath) {
-	if (styleList.length === 0) {
-		return false;
-	}
-
-	var stylesheetContents = [];
-	for (var i=0; i < styleList.length; i++) {
-		fs.readFile(path.dirname(filePath) + '/' + styleList[i], 'utf8', function (err, data) {
-			if (err) console.log(err);
-			stylesheetContents.push(data);
-		});
-	}
-
-	return stylesheetContents;
-}
