@@ -10,7 +10,7 @@ var through = require('through2');
 var spawn = require('win-spawn');
 var cheerio = require('cheerio');
 
-module.exports = function () {
+module.exports = function (opts) {
 	try {
 		which.sync('premailer');
 	} catch (err) {
@@ -28,20 +28,55 @@ module.exports = function () {
 			return done();
 		}
 
-		var $ = cheerio.load(file.contents.toString());
-		var stylesheetList = getStylesheetList($);
-		var stylesheetContents = getStylesheetContents(stylesheetList, file.path);
-
-		stylesheetContents.forEach(function(styles) {
-			$('head').append("<style>\r\n" + styles.toString() + "</style>\r\n");
-		});
-
-		file.contents = new Buffer($.html());
+		file.contents = new Buffer(file.contents.toString());
 
 		var self = this;
 		var errors = '';
 		var bufferObjs = [];
-		var cp = spawn('premailer', [file.path]);
+		var args = [file.path];
+
+		// Convert JS object to CLI args.. i.e. query-string: foo to
+		// --query-string=foo
+
+		// Only some CLI arguments need a value
+		var needsValue = [
+			'mode',
+			'm',
+			'base-url',
+			'b',
+			'query-string',
+			'q',
+			'css',
+			'line-length',
+			'l'
+		];
+
+		if(typeof(opts) == 'object') {
+			Object.keys(opts).forEach(function(key) {
+				if(opts[key]) {
+					var out = '';
+					var key = key.replace(/^--/,'');
+					var doesNeedValue = (needsValue.indexOf(key) != -1);
+
+					// Check if the argument needs a value, or if it doesn't, then the value is
+					// truthy.. i.e. version: true
+					if(doesNeedValue || opts[key]) {
+						out += '--' + key;
+					}
+
+					// Add the value for the argument
+					if(doesNeedValue) {
+						out += '=' + opts[key] + '';
+					}
+
+					if(out != '') {
+						args.push(out);
+					}
+				}
+			});
+		}
+
+		var cp = spawn('premailer', args);
 
 		cp.on('error', function (err) {
 			self.emit('error', new gutil.PluginError('gulp-premailer', err));
@@ -84,33 +119,3 @@ module.exports = function () {
 
 	return stream;
 };
-
-function getStylesheetList(cheerioObj) {
-	var stylesheetList = [];
-
-	cheerioObj('link').each(function (i, elem) {
-		stylesheetList[i] = cheerioObj(this).attr('href');
-	});
-
-	if (stylesheetList.length === 0) {
-		stylesheetList = false;
-	}
-
-	return stylesheetList;
-}
-
-function getStylesheetContents(styleList, filePath) {
-	if (styleList.length === 0) {
-		return false;
-	}
-
-	var stylesheetContents = [];
-	for (var i=0; i < styleList.length; i++) {
-		fs.readFile(path.dirname(filePath) + '/' + styleList[i], 'utf8', function (err, data) {
-			if (err) console.log(err);
-			stylesheetContents.push(data);
-		});
-	}
-
-	return stylesheetContents;
-}
