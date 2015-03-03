@@ -8,7 +8,6 @@ var path = require('path');
 var which = require('which');
 var through = require('through2');
 var spawn = require('win-spawn');
-var cheerio = require('cheerio');
 
 module.exports = function (opts) {
 	try {
@@ -51,25 +50,25 @@ module.exports = function (opts) {
 			'l'
 		];
 
-		if(typeof(opts) == 'object') {
-			Object.keys(opts).forEach(function(key) {
-				if(opts[key]) {
+		if (typeof(opts) == 'object') {
+			Object.keys(opts).forEach(function (key) {
+				if (opts[key]) {
 					var out = '';
 					var key = key.replace(/^--/,'');
 					var doesNeedValue = (needsValue.indexOf(key) != -1);
 
 					// Check if the argument needs a value, or if it doesn't, then the value is
 					// truthy.. i.e. version: true
-					if(doesNeedValue || opts[key]) {
+					if (doesNeedValue || opts[key]) {
 						out += '--' + key;
 					}
 
 					// Add the value for the argument
-					if(doesNeedValue) {
+					if (doesNeedValue) {
 						out += '=' + opts[key] + '';
 					}
 
-					if(out != '') {
+					if (out != '') {
 						args.push(out);
 					}
 				}

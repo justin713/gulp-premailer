@@ -32,8 +32,7 @@
     "gulp-util": "~2.2.0",
     "through2": "~0.4.0",
     "win-spawn": "~2.0.0",
-    "which": "~1.0.5",
-    "cheerio": "^0.15.0"
+    "which": "~1.0.5"
   },
   "devDependencies": {
     "mocha": "~1.17.1",
