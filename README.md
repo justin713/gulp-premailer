@@ -39,7 +39,5 @@ gulp.task('build', function () {
 
 In the example above, any files matched by the `gulp.src()` glob are processed by Premailer, piped to `gulp.dest()` and, finally, saved to `builds/matched-filename.html`.
 
-With the latest update, gulp-premailer supports linked stylesheets. Using [cheerio](http://matthewmueller.github.io/cheerio/) by [MatthewMueller](https://github.com/matthewmueller), gulp-premailer searches for `<link>` elements, then tries to find the referenced files and append them to the `<head>` and finally, removes the original `<link>` elements. (May make sense for this to be an option).
-
 ### Contributing
 As said previously, this is a learning project based on need for other projects and desire to experiment with node. I welcome all insight, discussion and code suggestions.
